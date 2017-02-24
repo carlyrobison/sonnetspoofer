@@ -4,7 +4,6 @@ from get_cmudict import read_cmudict
 from nltk.corpus import cmudict
 from countsyl import count_syllables
 
-LINES_IN_SONNET = 14
 cmu = cmudict.dict()
 
 
@@ -25,7 +24,7 @@ Apparently there are a couple sonnets which don't have exactly 14 lines...
 
 def read_shakespeare(filename):
     '''
-    Outputs a list of sonnets, with each sonnet a list of 14 lines; 
+    Outputs a list of sonnets, with each sonnet a list of lines; 
     and each line a list of words.
     '''
     sonnets = []
@@ -59,6 +58,8 @@ def read_shakespeare(filename):
     return sonnets
 
 def words_to_numbers(sonnets):
+    '''Converts a sonnet to a list of lists
+    with each word represented as a number'''
     word_dict = {}
     counter = 0
     sonnet_nums = []
@@ -75,17 +76,6 @@ def words_to_numbers(sonnets):
             sonnet_num += [sonnet_line]
         sonnet_nums += [sonnet_num]
     return sonnet_nums, word_dict
-
-def numbers_to_words(line, word_dict):
-    ret = ""
-    for i in range(len(line)):
-        num = line[i]
-        for word in word_dict:
-            if word_dict[word] == num:
-                ret += word
-        if i != len(line)-1:
-            ret += " "
-    return ret
 
 def stresses(cmu_listing):
     '''Some words have multiple pronunciations.  
@@ -113,6 +103,7 @@ def stresses(cmu_listing):
     return stresses
 
 def num_syllables(word):
+    '''Returns the number of syllables in a word'''
     if word.lower() in cmu:
         cmu_listing = listing(word)
         return len(stresses(cmu_listing))
@@ -123,29 +114,14 @@ def listing(cmu_word):
     '''Assumes cmu_word is in cmudict.'''
     return cmu[cmu_word.lower()][0]
 
-def make_sonnet(HMM, word_dict):
-    emission = []
-    for i in range(LINES_IN_SONNET):
-        em = HMM_sonnet.generate_emission(10)
-        em = numbers_to_words(em, word_dict)
-        em = em.split(' ')
-        em[0] = em[0][0].upper() + em[0][1:]
-        if i != LINES_IN_SONNET - 1:
-            em[-1] += ','
-        else:
-            em[-1] += '.'
-        emission += [' '.join(em)]
-    return emission
-
-
-
-if __name__ == '__main__':
+def load_model(n_states, n_poems, n_iters):
+    '''Loads a model of a sonnet'''
     sonnets = read_shakespeare("project2data/shakespeare.txt")
 
     sonnet_nums, word_dict = words_to_numbers(sonnets)
-    HMM_sonnet = HMM.unsupervised_HMM(sonnet_nums[0], 10, 200)
+    sonnet_train = [item for sublist in sonnet_nums[:n_poems] for item in sublist]
+    return HMM.unsupervised_HMM(sonnet_train, n_states, n_iters), word_dict
 
-    emission = make_sonnet(HMM_sonnet, word_dict)
-    for line in emission:
-        print line
+if __name__ == '__main__':
+    HMM_sonnet = load_model(10, 154, 25)
 
