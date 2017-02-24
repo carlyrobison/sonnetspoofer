@@ -1,7 +1,11 @@
 
 import HMM
+from get_cmudict import read_cmudict
+from nltk.corpus import cmudict
+from countsyl import count_syllables
 
 LINES_IN_SONNET = 14
+cmu = cmudict.dict()
 
 
 
@@ -11,6 +15,8 @@ TODO:
     punctuation/capitalization
     emphasis/accent/meter
     rhyming
+        Use stresses function but pick up pronunciations as well.
+        Rhyme defn: primary stressed vowel and everything after matches.
 
 Apparently there are a couple sonnets which don't have exactly 14 lines...
 '''
@@ -31,10 +37,24 @@ def read_shakespeare(filename):
             if line.strip().isdigit():
                 # read the sonnet, putting it into a data structure
                 sonnet = []
-                for i in range(LINES_IN_SONNET):
-                    sonnet += [f.readline().strip().split(' ')]
-                    # TODO split into syllables here
-                    #    got stuck on how to read from nltk cmudict
+                while True:
+                    line = f.readline().strip()
+                    if line == '':  # for sonnets with the wrong number of lines
+                        break
+                    line = line.replace('-', ' ')   # split hyphenated words
+
+                    # get rid of punctuation
+                    line = line.replace('.', '')
+                    line = line.replace(',', '')
+                    line = line.replace(':', '')
+                    line = line.replace('(', '')
+                    line = line.replace(')', '')
+
+                    # TODO split into syllables/bigrams here? how to do spaces?
+                    #       how to choose which pronunciation from cmudict?
+
+                    sonnet += [line.split(' ')]
+
                 sonnets += [sonnet]
     return sonnets
 
@@ -66,13 +86,56 @@ def numbers_to_words(line, word_dict):
             ret += " "
     return ret
 
+def stresses(cmu_listing):
+    '''Some words have multiple pronunciations.  
+    The input is which pronuncation.
+    E.g. [u'N', u'AE1', u'CH', u'ER0', u'AH0', u'L']
+        for 'NATURAL'.
+    '''
+    stresses = ''
+    syllables = []
+    syllable = ''
+    for item in cmu_listing:
+        if item[-1].isdigit():
+            stresses += item[-1]
+            syllable += item[:-1]
+            syllables += [syllable]
+            syllable = ''
+        else:
+            syllable += item
+
+    # At end, if last item did not end in a vowel, 
+    # append to last syllable
+    if not syllables[-1].isdigit():
+        syllables[-1] += syllable
+
+    return stresses
+
+def num_syllables(word):
+    if word.lower() in cmu:
+        cmu_listing = listing(word)
+        return len(stresses(cmu_listing))
+    else:
+        return count_syllables(word)
+
+def listing(cmu_word):
+    '''Assumes cmu_word is in cmudict.'''
+    return cmu[cmu_word.lower()][0]
+
 
 
 if __name__ == '__main__':
     sonnets = read_shakespeare("project2data/shakespeare.txt")
+    for sonnet in sonnets:
+        for line in sonnet:
+            for item in line:
+                print item, num_syllables(item)
+
+    '''
     sonnet_nums, word_dict = words_to_numbers(sonnets)
     HMM_sonnet = HMM.unsupervised_HMM(sonnet_nums[0], 10, 200)
     em = HMM_sonnet.generate_emission(50)
     print em
     print len(em)
     print numbers_to_words(em, word_dict)
+    '''
