@@ -67,10 +67,11 @@ def words_to_numbers(sonnets):
         for line in sonnet:
             sonnet_line = []
             for word in line:
-                if word not in word_dict:
-                    word_dict[word] = counter
+                l_word = word.lower()
+                if l_word not in word_dict:
+                    word_dict[l_word] = counter
                     counter += 1
-                sonnet_line += [word_dict[word]]
+                sonnet_line += [word_dict[l_word]]
             sonnet_num += [sonnet_line]
         sonnet_nums += [sonnet_num]
     return sonnet_nums, word_dict
@@ -122,20 +123,29 @@ def listing(cmu_word):
     '''Assumes cmu_word is in cmudict.'''
     return cmu[cmu_word.lower()][0]
 
+def make_sonnet(HMM, word_dict):
+    emission = []
+    for i in range(LINES_IN_SONNET):
+        em = HMM_sonnet.generate_emission(10)
+        em = numbers_to_words(em, word_dict)
+        em = em.split(' ')
+        em[0] = em[0][0].upper() + em[0][1:]
+        if i != LINES_IN_SONNET - 1:
+            em[-1] += ','
+        else:
+            em[-1] += '.'
+        emission += [' '.join(em)]
+    return emission
+
 
 
 if __name__ == '__main__':
     sonnets = read_shakespeare("project2data/shakespeare.txt")
-    for sonnet in sonnets:
-        for line in sonnet:
-            for item in line:
-                print item, num_syllables(item)
 
-    '''
     sonnet_nums, word_dict = words_to_numbers(sonnets)
     HMM_sonnet = HMM.unsupervised_HMM(sonnet_nums[0], 10, 200)
-    em = HMM_sonnet.generate_emission(50)
-    print em
-    print len(em)
-    print numbers_to_words(em, word_dict)
-    '''
+
+    emission = make_sonnet(HMM_sonnet, word_dict)
+    for line in emission:
+        print line
+
