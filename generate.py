@@ -1,64 +1,17 @@
 import preprocess
 import pronouncing as pron
-import random as r
+import random
+import representation as rep
+import numpy as np
 
 LINES_IN_SONNET = 14
 
 
-def generate_next_emission(HMM, l, seed):
-    '''TODO: actually incorporate the seed'''
-    ''' Generates an emission of length l, assuming that
-    the starting state is the seed. 
-
-    Arguments:
-        HMM:        the model used to generate the emission
-        l:          Length of the emission to generate.
-        seed: the starting emission
-
-    Returns:
-        emission:   The randomly generated emission as a string.
-    '''
-
-    emission = []
-    state = random.choice(range(self.L))
-
-    for t in range(M):
-        # Sample next observation.
-        rand_var = random.uniform(0, 1)
-        next_obs = 0
-
-        while rand_var > 0:
-            rand_var -= self.O[state][next_obs]
-            next_obs += 1
-
-        next_obs -= 1
-        emission += [next_obs]
-
-        # Sample next state.
-        rand_var = random.uniform(0, 1)
-        next_state = 0
-
-        while rand_var > 0:
-            rand_var -= self.A[state][next_state]
-            next_state += 1
-
-        next_state -= 1
-        state = next_state
-
-    return emission
-
-def numbers_to_words(line, word_dict):
-    '''Converts a generated sonnet of numbers into a sonnet with
-    words'''
-    ret = ""
-    for i in range(len(line)):
-        num = line[i]
-        for word in word_dict:
-            if word_dict[word] == num:
-                ret += word
-        if i != len(line)-1:
-            ret += " "
-    return ret
+def get_hidden_state(HMM, word, word_dict):
+    num = rep.word_to_number(word, word_dict)
+    state_probs = [l[num] for l in HMM.O] # get the hidden state distribution
+    normalized = [s/sum(state_probs) for s in state_probs]
+    return np.random.choice(range(HMM.L), p=normalized)
 
 def prettify_sonnet(sonnet):
     '''Capitalizes the first word of each line, adds punctuation.
@@ -79,7 +32,7 @@ def make_simple_sonnet(HMM, word_dict):
     emission = []
     for i in range(LINES_IN_SONNET):
         em = HMM_sonnet.generate_emission(10)
-        em = numbers_to_words(em, word_dict)
+        em = rep.numbers_to_words(em, word_dict)
         em = em.split(' ')
         emission += [' '.join(em)]
     return prettify_sonnet(emission)
@@ -90,7 +43,7 @@ def make_ramble_sonnet(HMM, word_dict):
     total_em = HMM_sonnet.generate_emission(10 * LINES_IN_SONNET)
     for i in range(LINES_IN_SONNET):
         em = total_em[10 * i: 10 * (i + 1)]
-        em = numbers_to_words(em, word_dict)
+        em = rep.numbers_to_words(em, word_dict)
         em = em.split(' ')
         emission += [' '.join(em)]
     return prettify_sonnet(emission)
@@ -101,7 +54,7 @@ def make_syllabic_sonnet(HMM, word_dict):
 
     for i in range(LINES_IN_SONNET):
         em = HMM_sonnet.generate_emission(10) # generate more syllables than we need
-        em = numbers_to_words(em, word_dict)
+        em = rep.numbers_to_words(em, word_dict)
         em = em.split(' ')
         num_syls_left = 10
         line = []
@@ -115,11 +68,11 @@ def make_syllabic_sonnet(HMM, word_dict):
 def get_rhyming_pair(word_dict):
     '''Generates a pair of rhymes for words that exist in these sonnets'''
     while True:
-        w = r.choice(word_dict.keys()) # grab a random word
+        w = random.choice(word_dict.keys()) # grab a random word
         rhymes = pron.rhymes(w)
         rhymes = [k for k in rhymes if k in word_dict]
         if len(rhymes) > 0:
-            return [w, r.choice(rhymes)]
+            return [w, random.choice(rhymes)]
 
 def get_rhymes(word_dict):
     '''Get the last words for rhyming schemes'''
@@ -138,7 +91,7 @@ def make_rhyming_sonnet(HMM, word_dict):
     rhymes = get_rhymes(word_dict)
     for i in range(LINES_IN_SONNET):
         em = HMM_sonnet.generate_emission(10) # more than we need
-        em = numbers_to_words(em, word_dict)
+        em = rep.numbers_to_words(em, word_dict)
         em = em.split(' ')
         rhyme = rhymes[i]
         num_syls_left = 10 - preprocess.num_syllables(rhyme)
@@ -151,8 +104,12 @@ def make_rhyming_sonnet(HMM, word_dict):
         emission += [' '.join(line)]
     return prettify_sonnet(emission)
 
+'''also TODO: generate backwards from rhyming word'''
+
 if __name__ == '__main__':
-    HMM_sonnet, word_dict = preprocess.load_model(10, 50, 10)
+    HMM_sonnet, word_dict = preprocess.load_model(5, 25, 10)
+
+    gen = HMM_sonnet.generate_seeded_emission(10, get_hidden_state(HMM_sonnet, 'thou', word_dict), word_dict)
 
     emission = make_rhyming_sonnet(HMM_sonnet, word_dict)
     for line in emission:

@@ -3,6 +3,7 @@ import HMM
 from get_cmudict import read_cmudict
 from nltk.corpus import cmudict
 from countsyl import count_syllables
+import representation as rep
 
 cmu = cmudict.dict()
 
@@ -57,26 +58,6 @@ def read_shakespeare(filename):
                 sonnets += [sonnet]
     return sonnets
 
-def words_to_numbers(sonnets):
-    '''Converts a sonnet to a list of lists
-    with each word represented as a number'''
-    word_dict = {}
-    counter = 0
-    sonnet_nums = []
-    for sonnet in sonnets:
-        sonnet_num = []
-        for line in sonnet:
-            sonnet_line = []
-            for word in line:
-                l_word = word.lower()
-                if l_word not in word_dict:
-                    word_dict[l_word] = counter
-                    counter += 1
-                sonnet_line += [word_dict[l_word]]
-            sonnet_num += [sonnet_line]
-        sonnet_nums += [sonnet_num]
-    return sonnet_nums, word_dict
-
 def stresses(cmu_listing):
     '''Some words have multiple pronunciations.  
     The input is which pronuncation.
@@ -118,7 +99,7 @@ def load_model(n_states, n_poems, n_iters):
     '''Loads a model of a sonnet'''
     sonnets = read_shakespeare("project2data/shakespeare.txt")
 
-    sonnet_nums, word_dict = words_to_numbers(sonnets)
+    sonnet_nums, word_dict = rep.words_to_numbers(sonnets)
     sonnet_train = [item for sublist in sonnet_nums[:n_poems] for item in sublist]
     return HMM.unsupervised_HMM(sonnet_train, n_states, n_iters), word_dict
 
