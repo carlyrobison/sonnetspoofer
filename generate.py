@@ -82,7 +82,7 @@ def make_10syllabic_sonnet(HMM, word_dict):
 
             # if the next word is too long, try a different next word
             while (num_syls_left - next_syls) < 0:  
-                em = HMM.generate_seeded_emission(3, get_hidden_state(HMM, line[-1], word_dict), word_dict)
+                em = HMM.generate_seeded_emission(num_syls_left, get_hidden_state(HMM, line[-1], word_dict), word_dict)
                 em = rep.numbers_to_words(em, word_dict).split(' ')
                 next_syls = preprocess.num_syllables(em[0])
 
