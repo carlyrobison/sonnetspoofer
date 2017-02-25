@@ -150,10 +150,6 @@ def make_rhyming_seeded_sonnet(HMM, word_dict):
     rhymes = get_rhymes(word_dict)
     for i in range(LINES_IN_SONNET):
         rhyme = rhymes[i]
-        print rhyme
-        print word_dict[rhyme]
-        print len(HMM.O), len(HMM.O[0])
-        print get_hidden_state(HMM, rhyme, word_dict)
         em = HMM.generate_seeded_emission(9, get_hidden_state(HMM, rhyme, word_dict), word_dict) # generate more syllables than we need
         em = rep.numbers_to_words(em, word_dict)
         em = em.split(' ')
@@ -171,7 +167,7 @@ def make_rhyming_seeded_sonnet(HMM, word_dict):
 
 if __name__ == '__main__':
     # if we are generating front to back, omit the backwards parameter
-    HMM_sonnet, word_dict = preprocess.load_model(5, 25, 10, backwards=True)
+    HMM_sonnet, word_dict = preprocess.load_model(5, 2, 10, backwards=True)
 
     emission = make_rhyming_seeded_sonnet(HMM_sonnet, word_dict)
 
