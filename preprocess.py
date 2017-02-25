@@ -95,20 +95,14 @@ def listing(cmu_word):
     '''Assumes cmu_word is in cmudict.'''
     return cmu[cmu_word.lower()][0]
 
-def load_model(n_states, n_poems, n_iters):
+def load_model(n_states, n_poems, n_iters, backwards=False):
     '''Loads a model of a sonnet'''
     sonnets = read_shakespeare("project2data/shakespeare.txt")
-
-    sonnet_nums, word_dict = rep.words_to_numbers(sonnets)
-    sonnet_train = [item for sublist in sonnet_nums[:n_poems] for item in sublist]
-    print sonnet_train[0]
-    # Make a set of observations.
-    max_num = 0
-    for x in sonnet_train:
-        for y in x:
-            if y > max_num:
-                max_num = y
-    print "obs len:", max_num
+    sonnet_nums, word_dict = rep.words_to_numbers(sonnets[:n_poems])
+    if backwards:
+        sonnet_train = [item[::-1] for sublist in sonnet_nums for item in sublist]
+    else:
+        sonnet_train = [item for sublist in sonnet_nums for item in sublist]
     return HMM.unsupervised_HMM(sonnet_train, n_states, n_iters), word_dict
 
 if __name__ == '__main__':

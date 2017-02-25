@@ -318,17 +318,6 @@ class HiddenMarkovModel:
         state = seeded_state
 
         for t in range(l):
-            # Sample next observation.
-            rand_var = random.uniform(0, 1)
-            next_obs = 0
-
-            while rand_var > 0:
-                rand_var -= self.O[state][next_obs]
-                next_obs += 1
-
-            next_obs -= 1
-            emission += [next_obs]
-
             # Sample next state.
             rand_var = random.uniform(0, 1)
             next_state = 0
@@ -340,27 +329,6 @@ class HiddenMarkovModel:
             next_state -= 1
             state = next_state
 
-        return emission
-
-    def generate_backwards_emission(self, l, seeded_state, word_dict):
-        '''TODO: the backwards part'''
-        ''' Generates an emission of length l, assuming that
-        the starting state is the seed. 
-
-        Arguments:
-            HMM:        the model used to generate the emission
-            l:          Length of the emission to generate.
-            seed:       the starting emission
-            word_dict:  the mapping of strings to emissions
-
-        Returns:
-            emission:   The randomly generated emission as a string.
-        '''
-
-        emission = []
-        state = seeded_state
-
-        for t in range(l):
             # Sample next observation.
             rand_var = random.uniform(0, 1)
             next_obs = 0
@@ -371,17 +339,6 @@ class HiddenMarkovModel:
 
             next_obs -= 1
             emission += [next_obs]
-
-            # Sample next state.
-            rand_var = random.uniform(0, 1)
-            next_state = 0
-
-            while rand_var > 0:
-                rand_var -= self.A[state][next_state]
-                next_state += 1
-
-            next_state -= 1
-            state = next_state
 
         return emission
 
