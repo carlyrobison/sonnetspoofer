@@ -116,13 +116,36 @@ def make_seeded_sonnet(HMM, word_dict, seed):
         emission += [seed + ' ' + ' '.join(em)]
     return prettify_sonnet(emission)
 
+def make_rhyming_seeded_sonnet(HMM, word_dict):
+    '''Backwards-seeds lines from the rhymes at the ends'''
+    emission = []
+    rhymes = get_rhymes(word_dict)
+    for i in range(LINES_IN_SONNET):
+        rhyme = rhymes[i]
+        print rhyme
+        print word_dict[rhyme]
+        print len(HMM.O), len(HMM.O[0])
+        print get_hidden_state(HMM, rhyme, word_dict)
+        em = HMM.generate_seeded_emission(9, get_hidden_state(HMM, rhyme, word_dict), word_dict) # generate more syllables than we need
+        em = rep.numbers_to_words(em, word_dict)
+        em = em.split(' ')
+        num_syls_left = 10 - preprocess.num_syllables(rhyme)
+        line = []
+        while (num_syls_left > 0): # tolerate 10+ syllable lines
+            line.append(em[0]) # add the next word
+            num_syls_left -= preprocess.num_syllables(em[0]) # decrement by the number of syllables of that word
+            em = em[1:] # take the word off the queue
+        line.append(rhyme)
+        emission += [' '.join(line[::-1])]
+    return prettify_sonnet(emission)
+
 '''also TODO: generate backwards from rhyming word'''
 
 if __name__ == '__main__':
-    HMM_sonnet, word_dict = preprocess.load_model(5, 25, 10)
+    # if we are generating front to back, omit the backwards parameter
+    HMM_sonnet, word_dict = preprocess.load_model(5, 25, 10, backwards=True)
 
-    gen = HMM_sonnet.generate_seeded_emission(10, get_hidden_state(HMM_sonnet, 'thou', word_dict), word_dict)
 
-    emission = make_seeded_sonnet(HMM_sonnet, word_dict, 'thou')
+    emission = make_rhyming_seeded_sonnet(HMM_sonnet, word_dict)
     for line in emission:
         print line
