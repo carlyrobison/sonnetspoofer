@@ -49,7 +49,8 @@ def make_ramble_sonnet(HMM, word_dict):
     return prettify_sonnet(emission)
 
 def make_syllabic_sonnet(HMM, word_dict):
-    '''Generates a sonnet of length 14 with 10 /syllables/ in each line'''
+    '''Generates a sonnet of length 14 with 
+    approximately 10 /syllables/ in each line'''
     emission = []
 
     for i in range(LINES_IN_SONNET):
@@ -63,6 +64,33 @@ def make_syllabic_sonnet(HMM, word_dict):
             num_syls_left -= preprocess.num_syllables(em[0]) # decrement by the number of syllables of that word
             em = em[1:] # take the word off the queue
         emission += [' '.join(line)]
+    return prettify_sonnet(emission)
+
+def make_10syllabic_sonnet(HMM, word_dict):
+    '''Generates a sonnet of length 14 with 
+    exactly 10 /syllables/ in each line'''
+    emission = []
+
+    for i in range(LINES_IN_SONNET):
+        em = HMM.generate_emission(10) # generate more syllables than we need
+        em = rep.numbers_to_words(em, word_dict)
+        em = em.split(' ')
+        num_syls_left = 10
+        line = []
+        while (num_syls_left > 0): # tolerate 10+ syllable lines
+            next_syls = preprocess.num_syllables(em[0])
+
+            # if the next word is too long, try a different next word
+            while (num_syls_left - next_syls) < 0:  
+                em = HMM.generate_seeded_emission(3, get_hidden_state(HMM, line[-1], word_dict), word_dict)
+                em = rep.numbers_to_words(em, word_dict).split(' ')
+                next_syls = preprocess.num_syllables(em[0])
+
+            line.append(em[0]) # add the next word
+            num_syls_left -= next_syls # decrement by the number of syllables of that word
+            em = em[1:] # take the word off the queue
+        emission += [' '.join(line)]
+
     return prettify_sonnet(emission)
 
 def get_rhyming_pair(word_dict):
@@ -145,7 +173,9 @@ if __name__ == '__main__':
     # if we are generating front to back, omit the backwards parameter
     HMM_sonnet, word_dict = preprocess.load_model(5, 25, 10, backwards=True)
 
-
     emission = make_rhyming_seeded_sonnet(HMM_sonnet, word_dict)
+
+    #emission = make_10syllabic_sonnet(HMM_sonnet, word_dict)
+
     for line in emission:
         print line
