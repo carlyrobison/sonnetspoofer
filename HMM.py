@@ -408,6 +408,7 @@ def unsupervised_HMM(X, n_states, n_iters):
     # Compute L and D.
     L = n_states
     D = len(observations)
+    print D
 
     # Randomly initialize and normalize matrices A and O.
     A = [[random.random() for i in range(L)] for j in range(L)]

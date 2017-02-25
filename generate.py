@@ -148,6 +148,7 @@ def make_seeded_sonnet(HMM, word_dict, seed):
 
 if __name__ == '__main__':
     HMM_sonnet, word_dict = preprocess.load_model(5, 25, 10)
+    print len(word_dict)
 
     # gen = HMM_sonnet.generate_seeded_emission(10, get_hidden_state(HMM_sonnet, 'thou', word_dict), word_dict)
 

@@ -101,6 +101,14 @@ def load_model(n_states, n_poems, n_iters):
 
     sonnet_nums, word_dict = rep.words_to_numbers(sonnets)
     sonnet_train = [item for sublist in sonnet_nums[:n_poems] for item in sublist]
+    print sonnet_train[0]
+    # Make a set of observations.
+    max_num = 0
+    for x in sonnet_train:
+        for y in x:
+            if y > max_num:
+                max_num = y
+    print "obs len:", max_num
     return HMM.unsupervised_HMM(sonnet_train, n_states, n_iters), word_dict
 
 if __name__ == '__main__':
