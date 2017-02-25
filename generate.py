@@ -7,6 +7,7 @@ import numpy as np
 LINES_IN_SONNET = 14
 
 
+
 def get_hidden_state(HMM, word, word_dict):
     num = rep.word_to_number(word, word_dict)
     state_probs = [l[num] for l in HMM.O] # get the hidden state distribution
@@ -150,7 +151,7 @@ def make_rhyming_seeded_sonnet(HMM, word_dict):
     rhymes = get_rhymes(word_dict)
     for i in range(LINES_IN_SONNET):
         rhyme = rhymes[i]
-        em = HMM.generate_seeded_emission(9, get_hidden_state(HMM, rhyme, word_dict), word_dict) # generate more syllables than we need
+        em = HMM.generate_seeded_emission(10, get_hidden_state(HMM, rhyme, word_dict), word_dict) # generate more syllables than we need
         em = rep.numbers_to_words(em, word_dict)
         em = em.split(' ')
         num_syls_left = 10 - preprocess.num_syllables(rhyme)
@@ -159,7 +160,7 @@ def make_rhyming_seeded_sonnet(HMM, word_dict):
             next_syls = preprocess.num_syllables(em[0])
             # if the next word is too long, try a different next word
             while (num_syls_left - next_syls) < 0:  
-                em = HMM.generate_seeded_emission(3, get_hidden_state(HMM, line[-1], word_dict), word_dict)
+                em = HMM.generate_seeded_emission(num_syls_left, get_hidden_state(HMM, line[-1], word_dict), word_dict)
                 em = rep.numbers_to_words(em, word_dict).split(' ')
                 next_syls = preprocess.num_syllables(em[0])
 
@@ -169,15 +170,17 @@ def make_rhyming_seeded_sonnet(HMM, word_dict):
         emission += [' '.join(line[::-1])]
     return prettify_sonnet(emission)
 
-'''also TODO: generate backwards from rhyming word'''
+
 
 if __name__ == '__main__':
     # if we are generating front to back, omit the backwards parameter
-    HMM_sonnet, word_dict = preprocess.load_model(20, 154, 100, backwards=True)
+    # HMM_sonnet, word_dict = preprocess.load_model(50, 154, 10, backwards=True)
+    filename = 'project2data/Alexander_Hamilton.txt'
+    HMM_sonnet, word_dict = preprocess.load_any_model(filename, 20, 100, backwards=True)
 
-    emission = make_rhyming_seeded_sonnet(HMM_sonnet, word_dict)
+    for i in range(10):
+        emission = make_rhyming_seeded_sonnet(HMM_sonnet, word_dict)
 
-    #emission = make_10syllabic_sonnet(HMM_sonnet, word_dict)
-
-    for line in emission:
-        print line
+        for line in emission:
+            print line
+        print "-"*50
