@@ -170,8 +170,6 @@ def make_rhyming_seeded_sonnet(HMM, word_dict):
         emission += [' '.join(line[::-1])]
     return prettify_sonnet(emission)
 
-
-
 if __name__ == '__main__':
     # if we are generating front to back, omit the backwards parameter
     # HMM_sonnet, word_dict = preprocess.load_model(50, 154, 10, backwards=True)
