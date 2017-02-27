@@ -171,7 +171,7 @@ def make_rhyming_seeded_sonnet(HMM, word_dict):
 
 if __name__ == '__main__':
     # if we are generating front to back, omit the backwards parameter
-    HMM_sonnet, word_dict = preprocess.load_model(40, 154, 100, backwards=True)
+    HMM_sonnet, word_dict = preprocess.load_model(5, 154, 10, backwards=True)
 
     for i in range(10):
         print '\t\t\t\t\t', i
