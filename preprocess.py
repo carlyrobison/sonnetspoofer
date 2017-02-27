@@ -58,6 +58,32 @@ def read_shakespeare(filename):
                 sonnets += [sonnet]
     return sonnets
 
+def read_anything(filename):
+    lines = []
+    with open(filename) as f:
+        while True:
+            line = f.readline()
+            if line == '':
+                break
+            if line != '\n':
+                # it's a line with text
+                line = line.strip()
+                line = line.replace('-', ' ')   # split hyphenated words
+                line = line.strip()
+                # get rid of punctuation
+                line = line.replace('.', '')
+                line = line.replace(',', '')
+                line = line.replace(':', '')
+                line = line.replace('(', '')
+                line = line.replace(')', '')
+                line = line.replace('!', '')
+                line = line.replace('?', '')
+                line = line.replace('"', '')
+                line = line.replace("'", '')
+                if line != '':
+                    lines += [line.split(' ')]
+    return [lines]
+
 def stresses(cmu_listing):
     '''Some words have multiple pronunciations.  
     The input is which pronuncation.
@@ -89,6 +115,8 @@ def num_syllables(word):
         cmu_listing = listing(word)
         return len(stresses(cmu_listing))
     else:
+        if len(word) == 0:
+            return 0    # temporary fix TODO
         return count_syllables(word)
 
 def listing(cmu_word):
@@ -98,7 +126,6 @@ def listing(cmu_word):
 def load_model(n_states, n_poems, n_iters, backwards=False):
     '''Loads a model of a sonnet'''
     sonnets = read_shakespeare("project2data/shakespeare.txt")
-
     sonnet_nums, word_dict = rep.words_to_numbers(sonnets[:n_poems])
     if backwards:
         sonnet_train = [item[::-1] for sublist in sonnet_nums for item in sublist]
@@ -106,6 +133,20 @@ def load_model(n_states, n_poems, n_iters, backwards=False):
         sonnet_train = [item for sublist in sonnet_nums for item in sublist]
     return HMM.unsupervised_HMM(sonnet_train, n_states, n_iters), word_dict
 
+def load_any_model(filename, n_states, n_iters, backwards=False):
+    '''Loads a model of a sonnet'''
+    things = read_anything(filename)
+    print things
+    thing_nums, word_dict = rep.words_to_numbers(things)
+    if backwards:
+        thing_train = [item[::-1] for sublist in thing_nums for item in sublist]
+    else:
+        thing_train = [item for sublist in thing_nums for item in sublist]
+    return HMM.unsupervised_HMM(thing_train, n_states, n_iters), word_dict
+
+
+
 if __name__ == '__main__':
-    HMM_sonnet = load_model(10, 154, 25)
+    # HMM_sonnet = load_model(10, 154, 25)
+    print read_anything('project2data/Alexander_Hamilton.txt')
 

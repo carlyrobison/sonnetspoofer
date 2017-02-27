@@ -1,5 +1,5 @@
 \newif\ifshowsolutions
-\showsolutionstrue
+\showsolutionsfalse
 \input{preamble}
 \newcommand{\boldline}[1]{\underline{\textbf{#1}}}
 
@@ -23,8 +23,18 @@
 \section{Tokenizing}
 \subsection{Methods Used}
 What methods did you use and try to tokenize the sonnets?
+\begin{itemize}
+	\item First we tried the na\"ive tokenization of using each word as a token.  With enough states and iterations, this actually learned fairly well.
+\end{itemize}
+
 \subsection{Modifications}
 Did you have to make changes to the way you tokenized after running the algorithm and seeing the results?
+\begin{itemize}
+	\item We thought about splitting each word into syllables in order to keep to the 10-syllable format of a sonnet.  However, we got around that by counting the number of syllables generated per line, and generating new words if the last word was too long.
+	\item We also thought about trying to train using bigrams of words as tokens; but again, the na\"ive implementation worked fairly well.
+\end{itemize}
+
+
 
 \section{Algorithm}
 \subsection{Packages Used}
@@ -34,13 +44,17 @@ What decisions did you have to make when running the algorithm and what did you 
 \subsection{Effect On Sonnets}
 How did this affect the sonnets that were generated
 
+
+
 \section{Poetry Generation}
 \subsection{How?}
 How did you generate your poem?
-\subsection{How to get to look like a sonnet?}
+\subsection{How to get it to look like a sonnet?}
 How did you get your poem to look as much like a sonnet as possible?
 \subsection{Do they make sense?}
 What makes sense/what doesn't about the sonnets generated?
+
+
 
 \section{Visualization and Interpretation}
 \subsection{Hidden State Meaning}
@@ -51,12 +65,18 @@ e.g. Correlation between hidden states and syllable counts, connotations of word
 \subsection{Visual representation}
 Make a visual representation of the correlation between states and words
 
+
+
 \section{Additional Goals}
 e.g. rhyme/meter
+
+
 
 \section{Extra Credit: RNN}
 What did you use to collect more data and what packages did you use for RNN/LSTM?
 Compare/contrast the effect of these algorithms to HMM and why you think they were better or worse
+
+
 
 \section{Conclusion}
 \subsection{Division of work}
