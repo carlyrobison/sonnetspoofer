@@ -9,20 +9,6 @@ cmu = cmudict.dict()
 
 
 
-'''
-TODO:
-    syllable processing
-    punctuation/capitalization
-    emphasis/accent/meter
-    rhyming
-        Use stresses function but pick up pronunciations as well.
-        Rhyme defn: primary stressed vowel and everything after matches.
-
-Apparently there are a couple sonnets which don't have exactly 14 lines...
-'''
-
-
-
 def read_shakespeare(filename):
     '''
     Outputs a list of sonnets, with each sonnet a list of lines; 
@@ -49,9 +35,6 @@ def read_shakespeare(filename):
                     line = line.replace(':', '')
                     line = line.replace('(', '')
                     line = line.replace(')', '')
-
-                    # TODO split into syllables/bigrams here? how to do spaces?
-                    #       how to choose which pronunciation from cmudict?
 
                     sonnet += [line.split(' ')]
 
@@ -125,7 +108,7 @@ def listing(cmu_word):
 
 def load_model(n_states, n_poems, n_iters, backwards=False):
     '''Loads a model of a sonnet'''
-    sonnets = read_shakespeare("../project2data/shakespeare.txt")
+    sonnets = read_shakespeare("project2data/shakespeare.txt")
     sonnet_nums, word_dict = rep.words_to_numbers(sonnets[:n_poems])
     if backwards:
         sonnet_train = [item[::-1] for sublist in sonnet_nums for item in sublist]
@@ -148,5 +131,5 @@ def load_any_model(filename, n_states, n_iters, backwards=False):
 
 if __name__ == '__main__':
     # HMM_sonnet = load_model(10, 154, 25)
-    print read_anything('../project2data/Alexander_Hamilton.txt')
+    print read_anything('project2data/Alexander_Hamilton.txt')
 
