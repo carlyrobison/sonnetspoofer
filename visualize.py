@@ -22,6 +22,7 @@ discussion about your model.
 '''
 
 def get_popular_words(HMM, word_dict):
+	ret = []
 	for i in range(HMM.L): # for each hidden state
 		ordering = HMM.O[i]
 
@@ -31,7 +32,36 @@ def get_popular_words(HMM, word_dict):
 			word = rep.number_to_word(j, word_dict)
 			if word is not None:
 				d[word] = ordering[j]
-		print "state", i, "\t words:", heapq.nlargest(10, d, key=d.__getitem__)
+		print "state", i, "\t words:", heapq.nlargest(20, d, key=d.__getitem__)
+		ret.append(heapq.nlargest(20, d, key=d.__getitem__))
+	return ret
+
+def get_long_popular_words(HMM, word_dict):
+	ret = []
+	for i in range(HMM.L): # for each hidden state
+		ordering = HMM.O[i]
+
+		# construct a dictionary of probs
+		d = defaultdict(int)
+		for j in range(len(ordering)): # for each word
+			word = rep.number_to_word(j, word_dict)
+			if word is not None and preprocess.num_syllables(word) > 1:
+				d[word] = ordering[j]
+		print "state", i, "\t long words:", heapq.nlargest(20, d, key=d.__getitem__)
+		ret.append(heapq.nlargest(20, d, key=d.__getitem__))
+	return ret
+
+def get_most_likely_state(HMM, word_dict):
+	'''For each word, find its most likely state'''
+	d = dict()
+	for i in range(HMM.L): # for each hidden state
+		d[i] = []
+	for j in range(HMM.D): # for each word
+		# get the index of the maximum
+		probs = [a[j] for a in HMM.O]
+		state = probs.index(max(probs))
+		d[state].append(rep.number_to_word(j, word_dict))
+	return d
 
 if __name__ == '__main__':
 	model, word_dict = preprocess.load_model(5, 25, 10)
