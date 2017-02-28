@@ -121,9 +121,12 @@ state 5    words: ['and', 'but', 'so', 'as', 'that', 'nor', 'then', 'by', 'thou'
 'or', 'how', 'when', 'thus', 'for', 'if', 'o', 'seem', 'not', 'yet']
 state 6    words: ['is', 'be', 'of', 'that', 'thee', 'more', 'do', 'love', 'now', 'and', 
 'praise', 'hath', 'their', 'have', 'are', 'still', 'doth', 'being', 'with', 'live']
-state 7    words: ['i', 'not', 'thee', 'me', 'that', 'time', 'o', 'she', 'be', 'you', 'art', 'him', 'it', 'truth', 'self', 'love', 'is', 'he', 'day', "time's"]
-state 8    words: ['thou', 'and', 'if', 'yet', 'but', 'to', 'for', 'who', 'when', 'that', 'those', 'no', 'so', 'as', 'with', 'which', 'can', 'do', 'therefore', 'by']
-state 9    words: ['my', 'the', 'i', 'thy', 'to', 'a', 'your', 'his', 'thee', 'you', 'this', 'it', 'mine', 'thine', 'should', 'me', 'of', 'their', 'sweet', 'one']
+state 7    words: ['i', 'not', 'thee', 'me', 'that', 'time', 'o', 'she', 'be', 'you',
+'art', 'him', 'it', 'truth', 'self', 'love', 'is', 'he', 'day', "time's"]
+state 8    words: ['thou', 'and', 'if', 'yet', 'but', 'to', 'for', 'who', 'when', 'that',
+'those', 'no', 'so', 'as', 'with', 'which', 'can', 'do', 'therefore', 'by']
+state 9    words: ['my', 'the', 'i', 'thy', 'to', 'a', 'your', 'his', 'thee', 'you', 'this',
+'it', 'mine', 'thine', 'should', 'me', 'of', 'their', 'sweet', 'one']
 \end{lstlisting}
 
 Thanks to the team Hidden Statespeare, we found this tool for visualizing our transition matrices.
@@ -148,7 +151,7 @@ From looking at the most common words for each state, we can extract some part o
 \item state 9/J: possessive adjectives and pronouns
 \end{compactitem}
 
-We also examined the top 20 mutisyllabic words for each state. From these we got the following additional characterization of the states:
+We also examined the top 20 mutisyllabic words for each state. Most two-syllable words in every state had a stressed-unstressed pattern, which mirrors the fact that this pattern is the most common stress pattern for English two-syllable words. From these lists we got the following additional characterizations of the states:
 \begin{compactitem}
 \item state 0/A: negative connotation (against, thievish, wasteful), contrasting (although, without, only)
 \item state 1/B: nouns, positive (beauty, treasure, glory), spiritual (mistress', spirit, body), time (minutes, summer)
@@ -162,13 +165,7 @@ We also examined the top 20 mutisyllabic words for each state. From these we got
 \item state 9/J: possessive adjectives (summer's, beauty's, heaven's, precious, beloved), obscured from view (seeming, painting, inward)
 \end{compactitem}
 
-
-
-
-What are some properties of the different hidden states?
-e.g. Correlation between hidden states and syllable counts, connotations of words, etc.
-[TODO]
-
+Regarding transitions (Figure 2), it makes sense that state J, which is very possessive, would transition to state B, which contains a lot of nouns. Similar inferences can be made but are more tenuous. Additional data can be found in the hidden_model.txt file in our codebase.
 
 \section{Additional Improvements}
 \subsection{Rhyme}
@@ -202,7 +199,7 @@ Dying down the is to hey x i brew.
 	}
 \end{figure}
 
-
+\newpage
 
 \section{Conclusion}
 \subsection{Division of work}
@@ -231,6 +228,7 @@ Relatedly, incorporating different source material was harder than expected, mos
 
 This project was a lot of fun.  We really enjoyed playing around with the different poems, and reading them aloud to everyone who passed by.  
 
+Our code is available at \href{https://github.com/carlyrobison/sonnetspoofer/}{this} github repo.
 
 
 
