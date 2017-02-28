@@ -1,9 +1,14 @@
 \newif\ifshowsolutions
 \showsolutionsfalse
 \input{preamble}
-\usepackage{listings}
-\newcommand{\boldline}[1]{\underline{\textbf{#1}}}
 
+\usepackage{listings}
+\usepackage{caption}
+
+\captionsetup{margin=0.5in}
+\captionsetup{labelfont=bf}
+
+\newcommand{\boldline}[1]{\underline{\textbf{#1}}}
 \newcommand{\plotteddata}[3]{
   \begin{figure}[h]
   \caption{#1}
@@ -26,8 +31,12 @@
   }
 }
 
+
+
 \begin{document}
 \pagestyle{fancy}
+
+
 
 \section{Tokenizing}
 \subsection{Methods Used}
@@ -50,11 +59,11 @@ Did you have to make changes to the way you tokenized after running the algorith
 
 \section{Algorithm}
 \subsection{Packages Used}
-We used the HW5 solutions for unsupervised HMM training. We also used {\tt NLTK}'s dictionary of words to get syllable counts and the {\tt pronouncing} package, which is based on {\tt} NLTK's CMUdict, to find rhymes.
+We used the HW5 solutions for unsupervised HMM training. We used {\tt NLTK}'s dictionary of words to get syllable counts for most words and the {\tt pronouncing} package, which is based on {\tt NLTK}'s {\tt CMUdict}, to find rhymes.  For words that were not in {\tt NLTK}'s {\tt CMUdict}, we used the count_syllables function from a package called Poetry-Tools\footnote{https://github.com/hyperreality/Poetry-Tools/blob/master/poetrytools/countsyl.py}.
 \subsection{Parameters Used}
 \begin{itemize}
-\item \textbf{Hidden States.} We experimented with different numbers of hidden states. For testing our other algorithms we used 5 hidden states, which produced poems with no sense at all. We found that the poems generated with 10 or 20 states were about the same level of coherence.
-\item \textbf{Number of Poems.} With fewer poems, we got more content coherence, but more training data the poems we generated had more grammatical sense.
+\item \textbf{Hidden States.} We experimented with different numbers of hidden states. For testing our algorithms we started with 5 hidden states, which produced poems with no sense at all. We found that the poems generated with 10 or 20 states were about the same level of coherence.
+\item \textbf{Number of Poems.} With fewer poems, we got more content coherence; but with more training data the poems we generated had more grammatical sense.
 \item \textbf{Number of Iterations.} We found it hard to tell how many iterations to use; we used anywhere from 15 to 100 for our final poems, and this choice was almost exclusively based on runtime.
 \end{itemize}
 
@@ -62,13 +71,15 @@ We used the HW5 solutions for unsupervised HMM training. We also used {\tt NLTK}
 
 \section{Poetry Generation}
 \subsection{Generation Process}
-We iterated through multiple ideas to get a good sonnet. We first took 14 emissions of 10 lines each. We added rhyming by pregenerating pairs of rhyming words that both occurred in Shakespeare's sonnets, and adding them to the end of the lines in the ABABCDCDEFEFGG rhyming scheme. We eventually succeeded in ``seeding'' the HMM emission process with a hidden state chosen according to the emission probabilities for a given word. Our final poetry generation process trained on backwards lines and generated lines backwards from the rhyme at the end. We reversed the line and combined them to make a 14-line sonnet.
+We iterated through multiple ideas to get a good sonnet. We first took 14 emissions of 10 lines each. We added rhyming by pre-generating pairs of rhyming words that both occurred in Shakespeare's sonnets, and adding them to the end of the lines in the {\tt ABABCDCDEFEFGG} rhyming scheme. We eventually succeeded in ``seeding'' the HMM emission process with a hidden state chosen according to the emission probabilities for a given word. Our final poetry generation process trained on backwards lines and generated lines backwards from the rhyme at the end. We reversed the line and combined them to make a 14-line sonnet.
 \subsection{How to get it to look like a sonnet?}
 We used {\tt pronouncing}'s functionality to ensure the correct rhyme scheme. We ensured 10 syllables by predicting sequences of new words when we ran out of space, and doing so until we could finish the line. We generated 14 lines.
 \subsection{Do they make sense?}
-We did not train or enforce meter, yet many of the sonnets have some kind of iambic meter, but not always carried through all of the lines. It is hard to tell from the most popular words for each state, but some states must have started contained stressed words and others would not have, and alternating between states would give the correct iambic stress pattern. The rhyme and syllable count are correct, because our generation process enforces their correctness. Most of the sonnets make sense if read dramatically, and because of the vocbulary still sound like Shakespeare. Here is the poem we submitted, which was actually generated with 40 states:\\
+We did not train or enforce meter, yet many of the sonnets have some kind of iambic meter, but not always carried through all of the lines. It is hard to tell from the most popular words for each state, but some states must have contained words which started with stressed syllables and others would not have, and alternating between states would give the correct iambic stress pattern. The rhyme and syllable counts are correct, because our generation process enforces their correctness. Most of the sonnets make sense if read dramatically, and because of the vocabulary they still sound like Shakespeare.  
 
-0\\
+\begin{figure}[h!]
+	\begin{center}
+{\bf 0}\\
 \noindent Seasons him make but heart my such being,\\
 Rosy gardens all that although is morn,\\
 Serving against self beauty i seeing,\\
@@ -82,10 +93,12 @@ Shall whose shapes but his and with my straying,\\
 Which so dearest temptation i woe through,\\
 What to that it cross not in be saying,\\
 Black enough make muse thee like of thee halt,\\
-Of not eyes flies false the viewest did fault.\\
-
-Since all of Shakespeare's sonnets are numbered, we numbered our sonnet 0, because computer scientists zero-index.
-
+Of not eyes flies false the viewest did fault.
+	\end{center}
+	\caption{
+		Submitted poem, generated with 40 states.  Since Shakespeare's sonnets are numbered 1 to 154, and because computer scientists zero-index, we numbered our sonnet 0.  
+	}
+\end{figure}
 
 \section{Visualization and Interpretation}
 \subsection{Hidden State Meaning}
@@ -137,26 +150,69 @@ e.g. Correlation between hidden states and syllable counts, connotations of word
 
 \section{Additional Improvements}
 \subsection{Rhyme}
-We incorporated rhyme by picking seven pairs of rhymes, arranging them in the correct order, and using them at the end of the line. The lines generated forward would often not match with the rhymes at the end, so we switched to generating each line backwards from its ending rhyme.
+We incorporated rhyme by randomly picking seven pairs of rhymes, arranging them in the correct order, and using them at the end of the line. The lines generated forward would often not make sense with forcing the rhymes at the end, so we switched to generating each line backwards from its ending rhyme.
+
 \subsection{Additional texts: \emph{Hamilton} songs}
-Shari?
+We also trained our sonnets on the first three songs of \emph{Hamilton}.  These songs had a much larger variety of punctuation, in both symbols used and placement (for example, many lines ended with a dash); so in addition to removing periods, commas, colons, and parentheses, we also removed exclamation points, question marks, double and single quotes, em dashes, and ellipses.  This resulted in some fairly strange grammar, particularly when it came to removing single quotes in contractions (producing words like ``n'' and ``evry'', but also unclear grammar in words like ``its''/``it's''); but we still chose to remove single quotes because of the number of single-quoted quotations.  
+
+The songs in Hamilton also had many lines which were \emph{much} shorter than ten syllables, which may have negatively contributed to the sense of the resulting poem.
+
+\begin{figure}[h!]
+	\begin{center}
+{\bf 1776}\\
+Throwing america some up not what, \\
+Afar take a it what do you with split, \\
+Not were im but im i dead gonna but,  \\
+Gonna new name face shes good out of it, \\
+Two yo sugar to they a guarantee,  \\
+To run i its not but his to am gods,  \\
+Cousin are he ready the he squat oui,  \\
+Came and time when anybody down odds, \\
+See socially and burr the you forgot,  \\
+Every york a get or to plenty,  \\
+Yo im dying but not so so its got,  \\
+A whoa a n up yo and i many, \\
+Im hey but our aint until was do,  \\
+Dying down the is to hey x i brew. 
+	\end{center}
+	\caption{
+		The above sonnet, which we submitted on Piazza along with our Shakespearean sonnet, was trained using 20 states over 100 iterations.  It makes much less sense than the Shakespearean one.
+	}
+\end{figure}
 
 
 
 \section{Conclusion}
 \subsection{Division of work}
-Shari worked on getting the initial 14-line sonnet, ensuring that lines were 10 syllables with resampling, and incorporating additional source material.
+Shari worked on preprocessing, getting the initial 14-line sonnet, ensuring that lines were 10 syllables with resampling, and incorporating additional source material.
 
 Carly worked on rhyming, seeded and backwards generations of emissions, and interpretation of hidden states.
+
 \subsection{Discoveries}
 What are your conclusions/observations about the models you used and the sonnets generated?
+\begin{itemize}
+	\item We conclude that this model captures the complexity of Shakespearean sonnets fairly well.  With enough training data, we produced poems which seemed quite similar to Shakespeare.  We were quite happy with the quality of our generated poems.  
+	\item On the other hand, a sonnet is long enough that our generated poems didn't stay on one topic from start to finish.  This could be because our HMM only takes into account the likelihood of transitioning between two states, without looking at any prior information, and could definitely be improved upon by using more than one layer of hidden states.
+\end{itemize}
+
 \subsection{Challenges}
+\begin{itemize}
+	\item Trying to get the poems to make sense was very difficult.  For the initial sonnets, there was a lot of very poor grammar.  We mostly fixed this by running the training algorithm on more data, with more states, and more iterations.
+Relatedly, incorporating different source material was harder than expected, mostly because the structure of \emph{Hamilton} songs is so different from that of Shakespeare's sonnets.  We had to make a lot of edits to the preprocessing code to get it to read the songs, and still ended up with poems which made less sense than the Shakespearean ones.
+	\item We also surprisingly found ourselves making a good number of edits to the {\tt HMM.py} code from Homework 5, to get the functions to output in different formats, and to generated seeded emissions.  For seeding emissions, given a word we had to figure out which state that word had come from in order to produce some most likely next words.  In order to do that, we chose to use the probability distribution of state transitions, but could have used the most likely state, or even kept track of the actual state throughout.
+	\item Finally, when trying to visualize and interpret the hidden states, we found a lot of the most-used words in each state had a huge overlap from state to state.  To solve this, we tried separating out the top unique words in each state.  However, we still had trouble separating the states into parts of speech, as many states seemed to be separated by topic (e.g.\ loneliness, or flowery language) than by function.
+\end{itemize}
+
+
+
 \subsection{Concluding Remarks}
 
-\begin{itemize}
+This project was a lot of fun.  We really enjoyed playing around with the different poems, and reading them aloud to everyone who passed by.  
 
-\item hey there
 
-\end{itemize}
+
+
+
+
 
 \end{document}
